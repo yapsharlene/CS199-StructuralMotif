@@ -5,7 +5,7 @@ This repository contains the implementation of a parallel polynomial-time approx
 insert tools used like biopython/pyrmsd etc
 
 ### Authors
-This study was authored by Bernard Brocka and Sharlene Yap under the guidance of their adviser, Jhoirene Clemente, in fulfilment of their CS199 course.
+This study was authored by Bernard Brocka and Sharlene Yap in fulfilment of their CS199 course under the guidance of their adviser, Jhoirene B. Clemente, Ph.D. 
 
 ### References
 [^1]: Qian, Jianbo & Li, Shuaicheng & Bu, Dongbo & Li, Ming & Xu, Jinbo. (2007). Finding Compact Structural Motifs. 142-149. 10.1007/978-3-540-73437-6_16.
