@@ -21,7 +21,7 @@ for i in range(1,len(structs)):
     centroid = get_centroid(structs[i])
     for j in range(len(structs[i])):
         for k in range(3):
-            structs[i][j][k] -= centroid
+            structs[i][j][k] -= centroid[k]
 
 superimposer = Bio.PDB.Superimposer()
 for i in range(1, len(structs)):
