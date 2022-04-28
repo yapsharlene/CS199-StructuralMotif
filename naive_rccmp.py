@@ -16,6 +16,13 @@ structs = get_structures("PDB files\Ref1")
 # (1) Fix P_1, translate other proteins to make centroids coincide
 fixed_struct = structs[0]
 
+# centering proteins
+for i in range(1,len(structs)):
+    centroid = get_centroid(structs[i])
+    for j in range(len(structs[i])):
+        for k in range(3):
+            structs[i][j][k] -= centroid
+
 superimposer = Bio.PDB.Superimposer()
 for i in range(1, len(structs)):
     # print_ca_coords(get_ca_atoms(structs[i], 3))

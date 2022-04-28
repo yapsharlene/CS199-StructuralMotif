@@ -79,6 +79,6 @@ def get_centroid(atom_list):
         centroid[2] += atom[2]
 
     for i in range(3):
-        centroid[i] = centroid[i]/len(atom_list)
+        centroid[i] /= float(len(atom_list))
 
     return (centroid[0], centroid[1], centroid[2])
