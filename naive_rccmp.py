@@ -1,10 +1,41 @@
 from pdb_input import *
 
+import itertools as it
+
 # INPUT:
 # - n protein structs (P_1, P_2, ..., P_n)
 # - length of RCCM l
 # - C number of residues
 # - r samples
+
+# coincides proteins with their centroid
+def center(proteins):
+    centered = []
+    for protein in proteins:
+        centroid = get_centroid(protein)
+        for j in range(len(protein)):
+            for k in range(3):
+                protein[j][k] -= centroid[k]
+        centered.append(protein)
+    return centered
+
+# gets valid range in extracting l-mers 
+def get_range(proteins, r, l):
+    ranges = []
+    for i in range(r):
+        ranges.append(range(len(proteins[i])-l+1))
+    return ranges
+
+# gets all r l-length motifs
+def sample(proteins, r, l):
+    samples = []    
+    for indices in it.combinations(range(len(proteins),r)):
+        for range in get_range(proteins, indices, l):
+            sample = []
+            for i in range(len(indices)):
+                sample.append(indices[i],range[i])
+            samples.append(sample)
+    return sample
 
 # === MAIN === #
 
@@ -17,11 +48,15 @@ structs = get_structures("PDB files\Ref1")
 fixed_struct = structs[0]
 
 # centering proteins
-for i in range(1,len(structs)):
-    centroid = get_centroid(structs[i])
-    for j in range(len(structs[i])):
-        for k in range(3):
-            structs[i][j][k] -= centroid[k]
+centered_structs = center(structs[1:])
+# for i in range(1,len(structs)):
+#     centroid = get_centroid(structs[i])
+#     for j in range(len(structs[i])):
+#         for k in range(3):
+#             structs[i][j][k] -= centroid[k]
+
+# getting samples
+sample_residues = sample(centered_structs)
 
 superimposer = Bio.PDB.Superimposer()
 for i in range(1, len(structs)):
