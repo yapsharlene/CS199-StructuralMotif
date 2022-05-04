@@ -33,7 +33,7 @@ def sample(proteins, r, l):
         for range in get_range(proteins, indices, l):
             sample = []
             for i in range(len(indices)):
-                sample.append(indices[i],range[i])
+                sample.append((indices[i],range[i]))
             samples.append(sample)
     return sample
 
