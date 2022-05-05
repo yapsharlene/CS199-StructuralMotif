@@ -26,7 +26,7 @@ def get_range(proteins, r, l):
         ranges.append(range(len(proteins[i])-l+1))
     return ranges
 
-# gets all r l-length motifs
+# gets the ranges of the motifs to be sampled
 def sample(proteins, r, l):
     samples = []    
     for indices in it.combinations(range(len(proteins),r)):
@@ -37,6 +37,23 @@ def sample(proteins, r, l):
             samples.append(sample)
     return sample
 
+# extracts the l-length motif given range
+def extract(proteins, idx, l):
+    motif = []
+    for (i,j) in idx:
+        motif.append(proteins[i][j:j+l])
+    return motif
+
+# calculates the largest ball size possible given the motifs
+def get_ball_size(motifs):
+    ball_sizes = []
+    for motif in motifs:
+        dim = []
+        dim.append(max(motif[0]) - min(motif[0]))
+        dim.append(max(motif[1]) - min(motif[1]))
+        dim.append(max(motif[2]) - min(motif[2]))
+        ball_sizes.append(max(dim)/float(2))   
+    return max(ball_sizes)
 # === MAIN === #
 
 BENCHMARK_LENGTH = 3
@@ -55,17 +72,24 @@ centered_structs = center(structs[1:])
 #         for k in range(3):
 #             structs[i][j][k] -= centroid[k]
 
-# getting samples
-sample_residues = sample(centered_structs)
+# getting samples (all r l-length motif)
+sample_ranges = sample(centered_structs)
 
-superimposer = Bio.PDB.Superimposer()
-for i in range(1, len(structs)):
-    # print_ca_coords(get_ca_atoms(structs[i], 3))
-    superimposer.set_atoms(get_ca_atoms_of_range(fixed_struct, BENCHMARK_LENGTH), get_ca_atoms_of_range(structs[i], BENCHMARK_LENGTH))
-    superimposer.apply(get_ca_atoms_of_range(structs[i], BENCHMARK_LENGTH))
-    # print(superimposer.rms)
-    # print(superimposer.rotran)
-    print("Superimposed alpha carbons of {0} to be as close as possible to {1}".format(structs[i].id, fixed_struct.id))
+for sample_range in sample_ranges:
+    # extract the l-length motifs
+    motifs = extract(centered_structs,BENCHMARK_LENGTH,sample_range)
+    
+    # calculate ball size 
+    ball_size = get_ball_size(motifs)
+
+    superimposer = Bio.PDB.Superimposer()
+    for i in range(1, len(structs)):
+        # print_ca_coords(get_ca_atoms(structs[i], 3))
+        superimposer.set_atoms(get_ca_atoms_of_range(fixed_struct, BENCHMARK_LENGTH), get_ca_atoms_of_range(structs[i], BENCHMARK_LENGTH))
+        superimposer.apply(get_ca_atoms_of_range(structs[i], BENCHMARK_LENGTH))
+        # print(superimposer.rms)
+        # print(superimposer.rotran)
+        print("Superimposed alpha carbons of {0} to be as close as possible to {1}".format(structs[i].id, fixed_struct.id))
 
 # (2) Select a length-l compact motif u1, u2, …, ur
 # where ui is a motif of some Pj and x is the total number of samples
