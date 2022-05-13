@@ -1,0 +1,45 @@
+libraries:
+- Bioython
+
+INPUT:
+- peptide backbones in PDB file format   
+
+sample usage:
+> python pepsquad.py <link to directory> <l> <r> <b> <d>
+
+
+- l: number of contiguous residues
+- r: integer parameter r = 2.. n, n number of peptides
+- b: ball size in Angstrom 
+- d allowable mismatch
+
+sample output:
+
+EVALUATED:  1427 / 1521 = 93.8198553583
+PAIRWISE RMSD: 0.31014226082
+SAMPLE: [(1, 1), (4, 15)]
+BEST_RMSD: 0.09633857888
+BEST_OCCURENCE: [9, 18, 5, 5, 6]
+BALL SIZE: 2.38404412683
+CONSENSUS:
+CA [-10.51800229  -0.82004004   7.67962309]
+CA [-7.96141675 -3.45935297  6.6270134 ]
+CA [-8.48554188 -2.79161183  2.91153484]
+
+OCCURRENCE:
+1 	1AD7 	10 	12 	CGU LEU ILE
+2 	1ONT 	19 	21 	LYS ASN ALA
+3 	1QFB 	6 	8 	PRO TRP CYS
+4 	2M7R 	6 	8 	SER CGU ALA
+5 	2MZK 	7 	9 	CGU LYS ALA
+
+
+XYZ files viewable using pymol or chimera
+
+ALN_OCCUR_BACK_i_l_r_b_d.xyz 	ith peptide aligned backbone
+OCCUR_BACK_i_l_r_b_d.xyz	ith occurrence backbone
+OCCUR_CA_i_l_r_b_d.xyz		ith occurrence CA atoms
+CONSENSUS_l_r_b_d.xyz		consensus pattern CA atoms
+
+
+
