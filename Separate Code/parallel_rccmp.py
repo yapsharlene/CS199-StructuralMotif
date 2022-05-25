@@ -176,6 +176,8 @@ def impose_step(data):
     min_feasible = None
     min_consensus = None
     min_occ = None
+    min_ball_size = None
+    min_sample = None
     
     for sample_range in tqdm(sample_ranges, desc = "superimposing ID: " + ID):
         # extract the l-length motifs
@@ -195,9 +197,10 @@ def impose_step(data):
                 min_consensus = consensus
                 min_feasible = feasible
                 min_occ = occ
-                min_sample = sample
+                min_sample = sample_range
+                min_ball_size = ball_size
 
-    return [count,min_trmsd,min_consensus,min_feasible,min_occ,min_sample]
+    return [count,min_trmsd,min_consensus,min_feasible,min_occ,min_sample,min_ball_size]
 
 # === MAIN === #
 if __name__ == "__main__":
@@ -206,16 +209,10 @@ if __name__ == "__main__":
     b = 2.5
     d = 0
     min_trmsd = sys.maxsize
-    min_feasible = None
-    min_consensus = None
-    min_occ = None
 
     # Get all protein structs
     # structs = get_structures("PDB files\Ref1")
-    structs = get_structures("/datasets","/pdb/")
-
-    # for i in structs[1]:
-    #     print(i)
+    structs = get_structures("/datasets","/conantokin/")
 
     # (1) Fix P_1, translate other proteins to make centroids coincide
     fixed_struct = structs[0]
@@ -223,57 +220,34 @@ if __name__ == "__main__":
     # centering proteins
     centered_structs = center(structs)
 
-    # print("======CENTERED!======")
-    # for i in centered_structs[1]:
-    #     print(i)
-
     # getting samples (all r l-length motif)
     sample_ranges = sample(centered_structs, r, BENCHMARK_LENGTH)
 
-    num_processors = 50
+    print(len(sample_ranges))
+
+    num_processors = 61
     div = int(len(sample_ranges)/num_processors)
     pool = multiprocessing.Pool(num_processors)
     results = pool.map(impose_step,[[sample_ranges[i:i+div],centered_structs,min_trmsd,BENCHMARK_LENGTH,b,str(int(i/div))] for i in range(0,len(sample_ranges),div)])
     pool.close()
 
     print(len(results))
-    # count = 0
+    
+    # get total count and result w/ smallest min_trmsd (first two elements)
+    minimum = min(results, key = lambda x: x[1])
+    tot_count = sum(i[0] for i in results)
+    minimum[0] = tot_count
+    
+    print("EVALUATED: ", tot_count, '/', len(sample_ranges), '=', (float(tot_count)/len(sample_ranges)) * 100.0)
 
-    # for sample_range in tqdm(sample_ranges, desc = "superimposing"):
-    #     # extract the l-length motifs
-    #     motifs = extract(centered_structs, sample_range, BENCHMARK_LENGTH)
-
-    #     # calculate ball size 
-    #     ball_size = get_ball_size(motifs)
-
-    #     if ball_size < b:
-    #         count += 1
-
-    #         (rmsd,consensus) = superimpose_samples(motifs)
-    #         (occ,trmsd,feasible) = get_feasible(consensus,centered_structs)
-
-    #         if min_trmsd > trmsd:
-    #             min_trmsd = trmsd
-    #             min_consensus = consensus
-    #             min_feasible = feasible
-    #             min_occ = occ
-    #             min_sample = sample
-
-    print("EVALUATED: ", count, '/', len(sample_ranges), '=', (float(count)/len(sample_ranges)) * 100.0)
-
-    if count > 0:
-        print("PAIRWISE RMSD:", pairwise_score(min_feasible))
+    # min_feasible is at index 3
+    if tot_count > 0:
+        print("PAIRWISE RMSD:", pairwise_score(minimum[3]))
     else:
         print("No Structural Motifs Found!")
-
-    # (2) Select a length-l compact motif u1, u2, …, ur
-    # where ui is a motif of some Pj and x is the total number of samples
-            
-
-    # (3) Select a transformation 𝜏2𝜏3,...,𝜏r
-
-    # (3a) Find the median for each discrete rigid transformation u
-
-    # (3b) Find the compact motif that minimizes the cMSD distance vi where i = 1, 2, … n
-
-    # (3c) Compute the objective function value c(u)
+    
+    # [count,min_trmsd,min_consensus,min_feasible,min_occ,min_sample,min_ball_size]
+    print("SAMPLE: ", minimum[5])
+    print("BEST_RMSD: ", minimum[1])
+    print("BEST_OCCURENCE", minimum[4])
+    print("BALL SIZE, ", minimum[6])
