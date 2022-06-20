@@ -1,4 +1,4 @@
-# Parallel PTAS for Finding Compact Structural Motifs on GPUs
+# Parallel PTAS for Finding Compact Structural Motifs
 This repository contains the implementation of a parallel polynomial-time approximation scheme for finding Compact Structural Motifs (as defined by Qian, et al. 2007[^1]).
 
 ## Abstract
